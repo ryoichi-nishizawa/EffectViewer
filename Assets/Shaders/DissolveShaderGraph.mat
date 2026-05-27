@@ -53,7 +53,7 @@ Material:
     m_Floats:
     - _AdjustAdd: 0.02
     - _DissolveAdjust: 0.02
-    - _DissolveAmount: 0
+    - _DissolveProgress: 0
     - _DissolveScale: 100
     - _NoiseScale: 50
     - _QueueControl: 0
