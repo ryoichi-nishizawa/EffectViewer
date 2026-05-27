@@ -6,11 +6,20 @@ public class DissolveShaderController : MonoBehaviour
     [SerializeField]
     Material targetMaterial = null;
 
+    [SerializeField]
+    Transform targetTransform = null;
+
     [SerializeField][Range(0.0f, 1.0f)]
     float progress = 0.0f;
 
     [SerializeField]
     float duration = 1.0f;
+
+    [SerializeField]
+    float scaleRange = 1.0f;
+
+    [SerializeField]
+    AnimationCurve scaleCurve;
 
     Coroutine progressCoroutine = null;
     public bool IsProcessing => progressCoroutine != null;
@@ -18,6 +27,9 @@ public class DissolveShaderController : MonoBehaviour
     void Update()
     {
         targetMaterial.SetFloat("_DissolveProgress", progress);
+
+        float scaleMultiplier = IsProcessing ? scaleCurve.Evaluate(progress) * scaleRange + 1.0f : 1.0f;
+        targetTransform.localScale = Vector3.one * scaleMultiplier;
     }
 
     public void StartProgress()
@@ -32,12 +44,11 @@ public class DissolveShaderController : MonoBehaviour
 
     public void StopProgress()
     {
-        if (!IsProcessing)
+        if (IsProcessing)
         {
-            return;
+            StopCoroutine(progressCoroutine);
         }
 
-        StopCoroutine(progressCoroutine);
         progressCoroutine = null;
         progress = 0.0f;
     }
@@ -51,7 +62,7 @@ public class DissolveShaderController : MonoBehaviour
         {
             elapsedTime += Time.deltaTime;
 
-            // 経過時間に応じて 0.0 から 1.0 の値を計算
+            // A value between 0.0 and 1.0 is calculated based on the elapsed time.
             progress = Mathf.Clamp01(elapsedTime / duration);
 
             yield return null;
