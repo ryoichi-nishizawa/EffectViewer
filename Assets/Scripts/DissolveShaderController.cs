@@ -19,17 +19,27 @@ public class DissolveShaderController : MonoBehaviour
     float scaleRange = 1.0f;
 
     [SerializeField]
-    AnimationCurve scaleCurve;
+    AnimationCurve scaleCurve = AnimationCurve.Linear(0, 0, 1, 1);
+
+    [SerializeField]
+    AnimationCurve dissolveCurve = AnimationCurve.Linear(0, 0, 1, 1);
+
+    [SerializeField]
+    ParticleSystem flashImpulse = null;
 
     Coroutine progressCoroutine = null;
     public bool IsProcessing => progressCoroutine != null;
 
     void Update()
     {
-        targetMaterial.SetFloat("_DissolveProgress", progress);
+        float easedProgress = dissolveCurve.Evaluate(progress);
+        targetMaterial?.SetFloat("_DissolveProgress", easedProgress);
 
         float scaleMultiplier = IsProcessing ? scaleCurve.Evaluate(progress) * scaleRange + 1.0f : 1.0f;
-        targetTransform.localScale = Vector3.one * scaleMultiplier;
+        if (targetTransform != null)
+        {
+            targetTransform.localScale = Vector3.one * scaleMultiplier;
+        }
     }
 
     public void StartProgress()
@@ -57,6 +67,9 @@ public class DissolveShaderController : MonoBehaviour
     {
         float elapsedTime = 0.0f;
         progress = 0.0f;
+
+        flashImpulse?.Play();
+        yield return null;
 
         while (elapsedTime < duration)
         {
