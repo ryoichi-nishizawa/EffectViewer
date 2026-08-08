@@ -7,7 +7,7 @@ using UnityEngine.ResourceManagement.AsyncOperations;
 public class ResourceManager : MonoBehaviour
 {
     private static ResourceManager _instance;
-    public static ResourceManager Instance { get; private set; }
+    public static ResourceManager Instance => _instance;
 
     // Cache AsyncOperationHandles required for releasing assets (Addressables.Release)
     private readonly Dictionary<string, AsyncOperationHandle> _handles = new();
@@ -18,7 +18,10 @@ public class ResourceManager : MonoBehaviour
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
     private static void Initialize()
     {
-        if (_instance != null) return;
+        if (_instance != null)
+        {
+            return;
+        }
 
         var go = new GameObject("[ResourceManager]");
         _instance = go.AddComponent<ResourceManager>();
